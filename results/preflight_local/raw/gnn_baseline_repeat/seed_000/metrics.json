@@ -1,0 +1,74 @@
+[
+  {
+    "iter": 0,
+    "vloss": 0.06046506389975548,
+    "acc": 0.13333334028720856,
+    "tv": 0.0,
+    "entropy": 1.3631894550972927,
+    "buffer": 30,
+    "openings": [
+      76
+    ],
+    "Lt": 0.0,
+    "Ct": 0.0,
+    "Ut": 0.0,
+    "Bt": 0.0,
+    "temp": 1.0,
+    "noise": 0.0,
+    "shifted": false,
+    "repeat": 1.0,
+    "games": 1,
+    "positions": 30,
+    "grad_steps": 2,
+    "sims_per_move": 4,
+    "teacher_sims": 120
+  },
+  {
+    "iter": 1,
+    "vloss": 1.895900845527649,
+    "acc": 0.03703703731298447,
+    "tv": 0.2746373116970062,
+    "entropy": 1.386294361115891,
+    "buffer": 57,
+    "openings": [
+      650
+    ],
+    "Lt": -1.8354,
+    "Ct": 1.0,
+    "Ut": -3.1709,
+    "Bt": 0.0,
+    "temp": 1.0,
+    "noise": 0.0,
+    "shifted": false,
+    "repeat": 0.5,
+    "games": 1,
+    "positions": 27,
+    "grad_steps": 2,
+    "sims_per_move": 4,
+    "teacher_sims": 108
+  },
+  {
+    "iter": 2,
+    "vloss": 0.33175018429756165,
+    "acc": 0.1666666716337204,
+    "tv": 0.40601205825805664,
+    "entropy": 1.3862943611158915,
+    "buffer": 64,
+    "openings": [
+      23
+    ],
+    "Lt": 1.5642,
+    "Ct": 1.0,
+    "Ut": 3.6283,
+    "Bt": 0.0,
+    "temp": 1.0,
+    "noise": 0.0,
+    "shifted": false,
+    "repeat": 0.3333333333333333,
+    "games": 1,
+    "positions": 54,
+    "grad_steps": 2,
+    "sims_per_move": 4,
+    "teacher_sims": 216
+  }
+]

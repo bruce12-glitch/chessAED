@@ -1,0 +1,215 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "manifest_verified",
+      "passed": true,
+      "detail": {
+        "locked": true
+      }
+    },
+    {
+      "name": "manifest_arm_parity",
+      "passed": true,
+      "detail": {
+        "iterations": 20,
+        "games_per_iter": 16,
+        "train_sims": 64,
+        "sample_per_iter": 512,
+        "passes_per_iter": 1,
+        "batch": 64,
+        "periodic_evals": 11,
+        "periodic_games": 16,
+        "net_sims": 64,
+        "ref_sims": 400
+      }
+    },
+    {
+      "name": "manifest_copied_to_output",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "aed_detector_can_fire_in_weak_stable_regime",
+      "passed": true,
+      "detail": {
+        "fires": 22,
+        "peak_Bt": 0.4746106583333333,
+        "Ut_in_stuck_regime": 0.06666666666666667,
+        "tau": 0.15,
+        "bmax": 0.5,
+        "lam": 0.9
+      }
+    },
+    {
+      "name": "arm_runs_and_saves[cnn_baseline]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "arm_runs_and_saves[cnn_fixed_noise]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "arm_runs_and_saves[cnn_random_trigger]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "arm_runs_and_saves[cnn_aed]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "arm_runs_and_saves[gnn_baseline]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "csv_and_json_columns[cnn_baseline]",
+      "passed": true,
+      "detail": {
+        "metrics": [],
+        "eval": [],
+        "run_info": []
+      }
+    },
+    {
+      "name": "csv_and_json_columns[cnn_fixed_noise]",
+      "passed": true,
+      "detail": {
+        "metrics": [],
+        "eval": [],
+        "run_info": []
+      }
+    },
+    {
+      "name": "csv_and_json_columns[cnn_random_trigger]",
+      "passed": true,
+      "detail": {
+        "metrics": [],
+        "eval": [],
+        "run_info": []
+      }
+    },
+    {
+      "name": "csv_and_json_columns[cnn_aed]",
+      "passed": true,
+      "detail": {
+        "metrics": [],
+        "eval": [],
+        "run_info": []
+      }
+    },
+    {
+      "name": "csv_and_json_columns[gnn_baseline]",
+      "passed": true,
+      "detail": {
+        "metrics": [],
+        "eval": [],
+        "run_info": []
+      }
+    },
+    {
+      "name": "no_arm_gets_more_games_epochs_sims",
+      "passed": true,
+      "detail": {
+        "iterations": {
+          "cnn_baseline": 3,
+          "cnn_fixed_noise": 3,
+          "cnn_random_trigger": 3,
+          "cnn_aed": 3,
+          "gnn_baseline": 3
+        },
+        "eval_games": {
+          "cnn_baseline": 6,
+          "cnn_fixed_noise": 6,
+          "cnn_random_trigger": 6,
+          "cnn_aed": 6,
+          "gnn_baseline": 6
+        },
+        "eval_sims": {
+          "cnn_baseline": [
+            8
+          ],
+          "cnn_fixed_noise": [
+            8
+          ],
+          "cnn_random_trigger": [
+            8
+          ],
+          "cnn_aed": [
+            8
+          ],
+          "gnn_baseline": [
+            8
+          ]
+        },
+        "total_teacher_sims_informational": {
+          "cnn_baseline": 444,
+          "cnn_fixed_noise": 648,
+          "cnn_random_trigger": 444,
+          "cnn_aed": 444,
+          "gnn_baseline": 444
+        }
+      }
+    },
+    {
+      "name": "device_and_worker_info_recorded",
+      "passed": true,
+      "detail": {
+        "cnn_params": 439984,
+        "gnn_params": 396936,
+        "device": "cpu",
+        "cuda_devices": 0,
+        "cuda_visible_devices": null,
+        "mcts_workers": 1,
+        "cpu_count": 16
+      }
+    },
+    {
+      "name": "same_seed_same_result[cnn_baseline]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same_seed_same_result[gnn_baseline]",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "interrupt_then_resume_matches_reference[cnn_aed]",
+      "passed": true,
+      "detail": {
+        "was_interrupted": true,
+        "resume_rc": 0,
+        "err": null
+      }
+    },
+    {
+      "name": "interrupt_then_resume_matches_reference[gnn_baseline]",
+      "passed": true,
+      "detail": {
+        "was_interrupted": true,
+        "resume_rc": 0,
+        "err": null
+      }
+    },
+    {
+      "name": "final_eval_tagged_csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "aggregator_accepts_partial_and_complete_shards",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "seconds": 425.9,
+  "env": {
+    "CUDA_VISIBLE_DEVICES": null,
+    "cpu_count": 16
+  }
+}

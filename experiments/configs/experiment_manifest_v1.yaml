@@ -1,0 +1,169 @@
+manifest_version: 1
+name: experiment_manifest_v1
+protocol: protocol_v2
+scenario:
+  version: gochess-scenarios-v1
+  rules:
+    size: 5
+    stone_supply: 6
+    max_plies: 100
+    komi: 1.5
+  train_start: initial_5x5
+  eval_scenario: mixed_midgame
+  digest: 70b314e7ce21471a8f26e3875d5333462442110ec5f66b75f4ce6c7593fc065b
+seeds:
+  phase_a_single:
+  - 0
+  phase_a:
+  - 0
+  - 1
+  - 2
+  ablation:
+  - 0
+  - 1
+  - 2
+  main:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+training:
+  iterations: 20
+  games_per_iter: 16
+  train_sims: 64
+  buffer: 4096
+  sample_per_iter: 512
+  passes_per_iter: 1
+  batch: 64
+  lr: 0.001
+  l2: 0.0001
+evaluation:
+  net_sims: 64
+  periodic:
+    every: 2
+    games_per_seat: 8
+    ref_sims: 400
+  final:
+    uct400:
+      games_per_seat: 25
+      ref_sims: 400
+    uct800:
+      games_per_seat: 25
+      ref_sims: 800
+  probes:
+    positions:
+    - mixed_midgame
+    - encirclement_choice
+    - initial_5x5
+    reference_sims: 800
+    reference_seed: 20261015
+    reference:
+      mixed_midgame: 40
+      encirclement_choice: 5
+      initial_5x5: 45
+models:
+  cnn:
+    kwargs:
+      channels: 64
+      blocks: 4
+    param_count: 439984
+  gnn:
+    kwargs:
+      hidden: 128
+      layers: 4
+    param_count: 396936
+aed:
+  beta_l: 2.0
+  beta_c: 0.5
+  tau: 0.15
+  lam: 0.9
+  bmax: 0.5
+  drop: none
+  random_p: 0.2
+  intervention:
+    temp_base: 1.0
+    temp_shift: 2.5
+    noise_base: 0.0
+    noise_shift: 0.3
+    duration: 3
+events:
+  tv_t: 0.15
+  entropy_eps_h: 0.05
+  wr_t: 0.4
+  consecutive: 3
+  escape_pp: 0.15
+  escape_hold: 2
+arms:
+  cnn_baseline:
+    arch: cnn
+    aed_mode: 'off'
+  cnn_fixed_noise:
+    arch: cnn
+    aed_mode: fixed-noise
+  cnn_random_trigger:
+    arch: cnn
+    aed_mode: random
+  cnn_aed:
+    arch: cnn
+    aed_mode: detector
+  gnn_baseline:
+    arch: gnn
+    aed_mode: 'off'
+  gnn_aed:
+    arch: gnn
+    aed_mode: detector
+    requires_gate: gnn_baseline
+gates:
+  gnn_baseline:
+    require_all_iterations: true
+    require_finite: true
+    require_vloss_improvement: true
+    require_eval_rows: true
+analysis:
+  primary:
+    treatment: cnn_aed
+    control: cnn_baseline
+    metric: final_winrate_uct400
+    test: paired_permutation
+    alpha: 0.05
+    n_perm: 100000
+    n_boot: 10000
+    rng_seed: 0
+  secondary_controls:
+  - cnn_fixed_noise
+  - cnn_random_trigger
+hardware:
+  device: auto
+  cpu_mcts_workers: 1
+code:
+  git_commit: unknown
+  file_sha256:
+    gochess/core.py: 0cf663ec8b6340868af72c28e3798d5f50f1075c54d377029a4285b285d6a726
+    gochess/search.py: 352ef7eaa69052bd56c3be9da16c09a0ca3c4c0770c0483fb2b1e4d82fbc079a
+    gochess/scenarios.py: b7080650cdc3b39146533f8fdbdf700094000d3d693494c906c1b3d615cb1ca0
+    gochess/nn.py: 69d5ee4ca37f7970dca8e1ca7b7bce140d7705e520635efba6e7b5371bed0ed9
+    gochess/gnn.py: 49afc3ff0e794967be189d27d7fd9674b0710d1f89c537a6ec397bc7f24073c5
+    gochess/graph.py: 6af3d38c248cab85c73c96087981fa05800f0af6966f8ab49270c3e83e45d147
+    gochess/representation.py: d6ec4135f925dd4773a9acc2c7013d93372770dff615f2ed25b75c01b1056948
+    aed/controller.py: 4a865d7370ea5ceff3dd4533af177ad770720355255fa221ccc8e03f52473c60
+    aed/detector.py: 15499429a40aa51de7a2010406ae08491bd8f575a51925772125f798a0615995
+    aed/interventions.py: bca9c0ce836b2cc397a3a32c2ff27f641e346990b5091839074a727ae887e925
+    aed/signals.py: 58ce0263908e127624fd971f29f33c840652418bead8d26df93b287f115ab55d
+    training/self_play.py: 009cb451983f522210da43590ce1d84420741f5c45dbbcbaddc8c50bf2413e9f
+    training/replay_buffer.py: 8529bd43ce1ecce6c0ec8af8bdde7d399207491c8992d5c63768c3420211a1d2
+    training/resume.py: 9896866b87085d470204c957be36729302785ec023f12db750d939b2420df143
+    experiments/run_aed.py: 9d7fb247c891c343f19c59630119d0aed966d3336c23b79619822c4eaa28cafd
+    experiments/run_evaluate.py: f19eabf82e3c102b27da6f9cb7a1a8a1dfe6a45c99e017069780d7546f2cfd90
+    experiments/eval_net.py: 0f5618e3d97c047ce6d20032e84cfaef43a000e6c7e8cc4abff8955a47d0bc53
+    evaluation/events.py: d5b1d5d910c205a7ec905d7f50a50257cea3bb0da8f3806289624ea6bc57c592
+    evaluation/diagnostics.py: fd587da1df8f818e11d23c5efaf7f779d7dc06e49483b409b104de8c9c4a2191
+    evaluation/probes.py: 4283d3126d48501563609acc5d45466141ef95cd83e1f3502b9efffb102c553c
+lock:
+  locked: true
+  manifest_hash: f8212559ebb000f80762dbb4264992dfb7575fc38b875d3eff93a1703592917c

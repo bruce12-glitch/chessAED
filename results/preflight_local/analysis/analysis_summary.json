@@ -1,0 +1,66 @@
+{
+  "manifest_hash": "f8212559ebb000f80762dbb4264992dfb7575fc38b875d3eff93a1703592917c",
+  "arms": {
+    "cnn_baseline": [
+      0
+    ],
+    "cnn_fixed_noise": [
+      0
+    ],
+    "cnn_random_trigger": [
+      0
+    ],
+    "cnn_aed": [
+      0
+    ],
+    "gnn_baseline": [
+      0
+    ],
+    "cnn_aed_interrupted": [
+      0
+    ],
+    "cnn_baseline_partial": [
+      0
+    ],
+    "cnn_baseline_repeat": [
+      0
+    ],
+    "gnn_baseline_interrupted": [
+      0
+    ],
+    "gnn_baseline_repeat": [
+      0
+    ]
+  },
+  "n_shards": 10,
+  "incomplete_shards": [
+    [
+      "cnn_baseline_partial",
+      0
+    ]
+  ],
+  "n_perm": 200,
+  "n_boot": 200,
+  "pairs": [
+    [
+      "primary",
+      "cnn_aed",
+      "cnn_baseline"
+    ],
+    [
+      "secondary",
+      "cnn_aed",
+      "cnn_fixed_noise"
+    ],
+    [
+      "secondary",
+      "cnn_aed",
+      "cnn_random_trigger"
+    ],
+    [
+      "representation_gnn_vs_cnn",
+      "gnn_baseline",
+      "cnn_baseline"
+    ]
+  ]
+}

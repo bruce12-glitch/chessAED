@@ -1,0 +1,19 @@
+{
+  "preregistered": true,
+  "metric": "final_winrate_uct400",
+  "test": "paired_permutation",
+  "alpha": 0.05,
+  "result": {
+    "kind": "primary",
+    "treatment": "cnn_aed",
+    "control": "cnn_baseline",
+    "metric": "final_winrate_uct400",
+    "n_pairs": 0,
+    "mean_diff": NaN,
+    "ci95_lo": NaN,
+    "ci95_hi": NaN,
+    "p_perm": NaN,
+    "p_holm": NaN
+  },
+  "reject_null": false
+}

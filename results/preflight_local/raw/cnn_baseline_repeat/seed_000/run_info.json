@@ -1,0 +1,14 @@
+{
+  "arch": "cnn",
+  "param_count": 439984,
+  "device": "cpu",
+  "cuda_available": false,
+  "cuda_devices": 0,
+  "cuda_visible_devices": null,
+  "mcts_workers": 1,
+  "torch_threads": 10,
+  "cpu_count": 16,
+  "python": "3.11.9",
+  "torch": "2.13.0+cpu",
+  "platform": "Windows-10-10.0.26300-SP0"
+}

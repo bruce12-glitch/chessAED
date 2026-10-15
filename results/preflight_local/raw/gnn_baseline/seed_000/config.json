@@ -1,0 +1,42 @@
+{
+  "experiment": "gnn_baseline",
+  "seed": 0,
+  "games": 1,
+  "train_mcts_sims": 4,
+  "epochs": 3,
+  "buffer": 64,
+  "sample": 16,
+  "passes": 1,
+  "batch": 8,
+  "lr": 0.001,
+  "l2": 0.0001,
+  "mode": "off",
+  "drop": "none",
+  "tau": 0.15,
+  "bmax": 0.5,
+  "lam": 0.9,
+  "beta_l": 2.0,
+  "beta_c": 0.5,
+  "random_p": 0.2,
+  "intervention": {
+    "temp_base": 1.0,
+    "temp_shift": 2.5,
+    "noise_base": 0.0,
+    "noise_shift": 0.3,
+    "duration": 3
+  },
+  "arch": "gnn",
+  "model_kwargs": {
+    "hidden": 128,
+    "layers": 4
+  },
+  "param_count": 396936,
+  "net": "gnn_128x4",
+  "git_commit": "unknown",
+  "manifest_hash": null,
+  "eval_every": 1,
+  "eval_games": 1,
+  "eval_sims": 8,
+  "eval_scenario": "mixed_midgame",
+  "config_hash": "c8e11a85d63e"
+}

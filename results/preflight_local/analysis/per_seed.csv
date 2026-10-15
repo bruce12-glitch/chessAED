@@ -1,0 +1,11 @@
+arm,arch,mode,seed,complete,n_iters,param_count,final_vloss,final_tv,final_entropy,final_repeat,final_disagreement,last_periodic_winrate,mean_periodic_winrate,final_winrate_uct400,final_n_uct400,final_uct400_wilson_lo,final_uct400_wilson_hi,final_winrate_uct800,final_n_uct800,final_uct800_wilson_lo,final_uct800_wilson_hi,weak_stable_iter,escape_iter,escaped,bad_min_v2_iter,n_triggers,first_trigger_iter
+cnn_baseline,cnn,off,0,True,3,439984,0.8996714353561401,0.028321392834186554,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,0.5,2,0.09452865480086614,0.9054713451991339,,,0,,0,
+cnn_fixed_noise,cnn,fixed-noise,0,True,3,439984,1.0099914073944092,0.13123975694179535,1.38629436111589,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+cnn_random_trigger,cnn,random,0,True,3,439984,0.8996714353561401,0.028321392834186554,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+cnn_aed,cnn,detector,0,True,3,439984,0.8996714353561401,0.028321392834186554,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+gnn_baseline,gnn,off,0,True,3,396936,0.33175018429756165,0.40601205825805664,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+cnn_aed_interrupted,cnn,detector,0,True,3,439984,0.8996714353561401,0.028321392834186554,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+cnn_baseline_partial,cnn,off,0,False,2,439984,1.045642375946045,0.010425431653857231,1.386294361115891,0.5,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+cnn_baseline_repeat,cnn,off,0,True,3,439984,0.8996714353561401,0.028321392834186554,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+gnn_baseline_interrupted,gnn,off,0,True,3,396936,0.33175018429756165,0.40601205825805664,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
+gnn_baseline_repeat,gnn,off,0,True,3,396936,0.33175018429756165,0.40601205825805664,1.3862943611158915,0.3333333333333333,nan,0.5,0.5,nan,0,nan,nan,nan,0,nan,nan,,,0,,0,
