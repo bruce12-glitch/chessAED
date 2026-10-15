@@ -72,6 +72,15 @@ class ManifestTests(unittest.TestCase):
     def test_lock_verify_tamper_and_relock(self) -> None:
         with TemporaryDirectory() as d:
             p = self._copy(Path(d))
+            m2 = MF.load(p)
+            m2["lock"] = {"locked": False, "manifest_hash": None}
+            m2["scenario"]["digest"] = None
+            m2["code"] = {"git_commit": None, "file_sha256": None}
+            m2["evaluation"]["probes"]["reference"] = None
+            for a in m2["models"]:
+                m2["models"][a]["param_count"] = None
+            import yaml as _yaml
+            p.write_text(_yaml.safe_dump(m2, sort_keys=False), encoding="utf-8")
             m = MF.lock(p, param_counts={"cnn": 111, "gnn": 222}, probe_reference={"mixed_midgame": 5})
             MF.verify(MF.load(p))
             self.assertEqual(m["models"]["gnn"]["param_count"], 222)
@@ -85,8 +94,17 @@ class ManifestTests(unittest.TestCase):
                 MF.verify(MF.load(p))
 
     def test_unlocked_refused_when_required(self) -> None:
+        m = MF.clone(MF.load())
+        m["lock"] = {"locked": False, "manifest_hash": None}
         with self.assertRaises(MF.ManifestError):
-            MF.verify(MF.load(), require_locked=True)
+            MF.verify(m, require_locked=True)
+
+    def test_copy_into_preserves_source_filename(self) -> None:
+        with TemporaryDirectory() as d:
+            p = self._copy(Path(d))
+            out = Path(d) / "out"
+            dst = MF.copy_into(out, p)
+            self.assertEqual(dst.name, p.name)
 
     def test_copy_into_idempotent_and_refuses_mixing(self) -> None:
         with TemporaryDirectory() as d:

@@ -6,6 +6,8 @@ from pathlib import Path
 
 import torch
 
+from training.device import resolve_device
+
 from gochess.core import GoChessState
 from gochess.nn import GoChessNet, obs_to_tensor
 from gochess.representation import encode_for
@@ -15,8 +17,10 @@ from gochess.evaluate import play_game, summarize
 
 
 class NetAgent:
-    def __init__(self, net: GoChessNet, sims: int = 32, seed: int = 0):
-        self.net = net
+    def __init__(self, net: GoChessNet, sims: int = 32, seed: int = 0,
+                 device: str = "auto"):
+        self.device = resolve_device(device)
+        self.net = net.to(self.device)
         self.sims = sims
         self.rng = __import__("random").Random(seed)
 
@@ -51,7 +55,7 @@ class NetAgent:
 
     def _net_value(self, state: GoChessState) -> float:
         with torch.no_grad():
-            x = encode_for(self.net, state).unsqueeze(0)
+            x = encode_for(self.net, state).unsqueeze(0).to(self.device)
             _, v = self.net(x)
             return v.item()
 
@@ -70,14 +74,17 @@ def main() -> int:
     ap.add_argument("--uct-sims", type=int, default=128)
     ap.add_argument("--games", type=int, default=10)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--device", type=str, default="auto", help="auto|cpu|cuda")
     a = ap.parse_args()
 
+    device = resolve_device(a.device)
     net = GoChessNet()
     net.load_state_dict(torch.load(a.ckpt, map_location="cpu"))
+    net.to(device)
     net.eval()
 
     state = scenarios()["mixed_midgame"].state
-    net_agent = NetAgent(net, sims=a.net_sims, seed=a.seed)
+    net_agent = NetAgent(net, sims=a.net_sims, seed=a.seed, device=a.device)
     uct_agent = lambda s: UCTAgent(simulations=a.uct_sims, seed=s)
 
     records = []

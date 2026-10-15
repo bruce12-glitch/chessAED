@@ -37,26 +37,29 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--raw", type=Path, default=Path("results/raw/main"))
     ap.add_argument("--skip-final-eval", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--device", type=str, default=None,
+                    help="auto|cpu|cuda; default follows manifest hardware.device")
     a = ap.parse_args(argv)
     m = MF.load(a.manifest)
     MF.verify(m, require_locked=not a.allow_unlocked, check_code=not a.allow_unlocked)
     seeds = m["seeds"][a.seed_set]
     arms = [x.strip() for x in a.arms.split(",")]
     MF.assert_arm_parity(m, arms)
+    device = a.device or m["hardware"].get("device", "auto")
     cells = plan(m, arms, seeds)
     if a.dry_run:
         print(json.dumps({"cells": cells, "budget": MF.expected_budget(m)}, indent=2))
         return 0
     MF.copy_into(a.raw, a.manifest)
     for arm, seed in cells:
-        args = MF.trainer_args(m, arm, seed, a.raw / arm, a.manifest) + ["--resume"]
+        args = MF.trainer_args(m, arm, seed, a.raw / arm, a.manifest) + ["--resume", "--device", device]
         if a.allow_unlocked:
             args.append("--allow-unlocked")
         r = subprocess.run([sys.executable, "-m", "experiments.run_aed"] + args, cwd=ROOT)
         if r.returncode != 0:
             raise RuntimeError(f"cell failed: {arm} seed {seed}")
         if not a.skip_final_eval:
-            final_evals(m, arm, seed, a.raw, a.manifest)
+            final_evals(m, arm, seed, a.raw, a.manifest, device)
     return 0
 
 

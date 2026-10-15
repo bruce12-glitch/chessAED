@@ -40,7 +40,9 @@ def save_train_state(path: Path, *, it: int, buf, ctl, prev_pm, metrics: list,
         "controller": export_controller(ctl), "prev_pm": prev_pm,
         "metrics": metrics, "all_openings": all_openings,
         "rng": {"python": random.getstate(), "numpy": np.random.get_state(),
-                "torch": torch.get_rng_state()},
+                "torch": torch.get_rng_state(),
+                "torch_cuda": (torch.cuda.get_rng_state_all()
+                               if torch.cuda.is_available() else None)},
     }, tmp)
     os.replace(tmp, path)
 
@@ -53,6 +55,8 @@ def restore_rng(rng: dict) -> None:
     random.setstate(rng["python"])
     np.random.set_state(rng["numpy"])
     torch.set_rng_state(rng["torch"])
+    if rng.get("torch_cuda") is not None and torch.cuda.is_available():
+        torch.cuda.set_rng_state_all(rng["torch_cuda"])
 
 
 def latest_resumable(out: Path) -> int | None:

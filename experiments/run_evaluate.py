@@ -12,6 +12,8 @@ from pathlib import Path
 
 import torch
 
+from training.device import resolve_device
+
 from experiments.eval_net import NetAgent
 from gochess.representation import load_model_from_checkpoint
 from gochess.scenarios import scenarios
@@ -33,12 +35,15 @@ def main() -> int:
     ap.add_argument("--tag", type=str, default="",
                     help="file prefix for non-periodic evals, e.g. final_uct800")
     ap.add_argument("--manifest", type=Path, default=None)
+    ap.add_argument("--device", type=str, default="auto", help="auto|cpu|cuda")
     a = ap.parse_args()
+    device = resolve_device(a.device)
     if a.manifest is not None:
         from experiments import manifest as MF
         MF.copy_into(a.output, a.manifest)
 
     net, ckpt = load_model_from_checkpoint(a.checkpoint)
+    net.to(device)
     config_hash = ckpt.get("config", {}).get("config_hash", "unknown")
 
     out = a.output / f"seed_{a.seed:03d}"
@@ -47,7 +52,7 @@ def main() -> int:
     rows = []
     for g in range(a.games):
         for seating in (0, 1):
-            agent = NetAgent(net, sims=a.net_sims, seed=a.seed + g)
+            agent = NetAgent(net, sims=a.net_sims, seed=a.seed + g, device=a.device)
             ref = UCTAgent(simulations=a.eval_sims, seed=a.seed + g * 2 + seating)
             if seating == 0:
                 t, plies = play_game(state, agent, ref)

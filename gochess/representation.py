@@ -67,9 +67,10 @@ def policy_probs(net, state):
     import torch
     from gochess.graph import action_mask
     with torch.no_grad():
-        logits, _ = net(encode_for(net, state).unsqueeze(0))
-        mask = torch.from_numpy(action_mask(state)).unsqueeze(0)
-        return masked_softmax(logits, mask)[0]
+        dev = next(net.parameters()).device
+        logits, _ = net(encode_for(net, state).unsqueeze(0).to(dev))
+        mask = torch.from_numpy(action_mask(state)).unsqueeze(0).to(dev)
+        return masked_softmax(logits, mask)[0].cpu()
 
 
 def load_model_from_checkpoint(path):

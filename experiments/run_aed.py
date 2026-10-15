@@ -33,6 +33,7 @@ from gochess.representation import (build_model, count_params, encode_state,
 from gochess.scenarios import scenarios
 from gochess.search import UCTAgent
 from training import resume as R
+from training.device import optimizer_to_device, resolve_device, seed_all
 from training.checkpointing import git_hash, save_checkpoint
 from training.replay_buffer import ReplayBuffer
 
@@ -104,7 +105,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--mode", type=str, default="detector",
                     choices=["detector", "random", "off", "diagnostics", "fixed-noise"])
     ap.add_argument("--drop", type=str, default="none", choices=["none", "value", "kl"])
-    ap.add_argument("--tau", type=float, default=0.01)
+    ap.add_argument("--tau", type=float, default=0.15)
     ap.add_argument("--bmax", type=float, default=0.5)
     ap.add_argument("--lam", type=float, default=0.9)
     ap.add_argument("--beta-l", type=float, default=2.0)
@@ -123,6 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--manifest", type=Path, default=None)
     ap.add_argument("--allow-unlocked", action="store_true")
     ap.add_argument("--resume", action="store_true")
+    ap.add_argument("--device", type=str, default="auto", help="auto|cpu|cuda")
     return ap
 
 
@@ -130,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
     kw = json.loads(a.model_kwargs) if a.model_kwargs else {}
     kw = model_kwargs(a.arch, kw)
+    device = resolve_device(a.device)
     manifest = None
     if a.manifest is not None:
         from experiments import manifest as MF
@@ -144,10 +147,9 @@ def main(argv: list[str] | None = None) -> int:
     iv = Intervention(temp_base=a.temp_base, temp_shift=a.temp_shift,
                       noise_base=a.noise_base, noise_shift=a.noise_shift,
                       duration=a.duration)
-    random.seed(a.seed)
-    np.random.seed(a.seed)
-    torch.manual_seed(a.seed)
-    net = build_model(a.arch, **kw)
+    device = resolve_device(a.device)
+    seed_all(a.seed, device)
+    net = build_model(a.arch, **kw).to(device)
     n_params = count_params(net)
     config = {"experiment": a.experiment, "seed": a.seed, "games": a.games,
               "train_mcts_sims": a.uct_simulations, "epochs": a.epochs,
@@ -165,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     config["config_hash"] = hashlib.sha256(json.dumps(
         {k: v for k, v in config.items() if k != "git_commit"},
         sort_keys=True).encode()).hexdigest()[:12]
+    config["device"] = str(device)
     out = a.output / f"seed_{a.seed:03d}"
     out.mkdir(parents=True, exist_ok=True)
     if a.resume and (out / "DONE").exists():
@@ -172,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     R.atomic_write_text(out / "config.json", json.dumps(config, indent=2) + "\n")
     R.atomic_write_text(out / "run_info.json", json.dumps({
-        "arch": a.arch, "param_count": n_params, "device": "cpu",
+        "arch": a.arch, "param_count": n_params, "device": str(device),
         "cuda_available": torch.cuda.is_available(),
         "cuda_devices": torch.cuda.device_count() if torch.cuda.is_available() else 0,
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -198,10 +201,13 @@ def main(argv: list[str] | None = None) -> int:
             ck = torch.load(out / f"ckpt_{last}.pt", map_location="cpu", weights_only=False)
             net.load_state_dict(ck["model"])
             opt.load_state_dict(ck["optimizer"])
+            optimizer_to_device(opt, device)
             b = st["buffer"]
             buf.obs, buf.pi, buf.z, buf.meta = b["obs"], b["pi"], b["z"], b["meta"]
             R.import_controller(ctl, st["controller"])
             prev_pm, metrics, all_openings = st["prev_pm"], st["metrics"], st["all_openings"]
+            if torch.is_tensor(prev_pm):
+                prev_pm = prev_pm.to(device)
             R.restore_rng(st["rng"])
             start_it = last + 1
             print(f"resumed after iter {last}", flush=True)
@@ -230,6 +236,7 @@ def main(argv: list[str] | None = None) -> int:
             ds = DataLoader(TensorDataset(xb, pib, zb), batch_size=a.batch, shuffle=True,
                             generator=torch.Generator().manual_seed(a.seed + it + 7919 * ps))
             for bxb, bpib, bzb in ds:
+                bxb, bpib, bzb = bxb.to(device), bpib.to(device), bzb.to(device)
                 logits, v = net(bxb)
                 loss = F.mse_loss(v, bzb) + F.cross_entropy(logits, bpib)
                 opt.zero_grad()
@@ -237,10 +244,11 @@ def main(argv: list[str] | None = None) -> int:
                 opt.step()
                 steps += 1
         net.eval()
+        Xd, PId, Zd = X.to(device), PI.to(device), Z.to(device)
         with torch.no_grad():
-            logits, v = net(X)
-            vloss = F.mse_loss(v, Z).item()
-            acc = (logits.argmax(1) == PI.argmax(1)).float().mean().item()
+            logits, v = net(Xd)
+            vloss = F.mse_loss(v, Zd).item()
+            acc = (logits.argmax(1) == PId.argmax(1)).float().mean().item()
             pm = F.softmax(logits, 1).mean(0)
             tv = policy_tv(pm.unsqueeze(0), prev_pm.unsqueeze(0)) if prev_pm is not None else 0.0
             prev_pm = pm.clone()
@@ -274,6 +282,7 @@ def main(argv: list[str] | None = None) -> int:
                  "--net-sims", str(a.uct_simulations),
                  "--eval-sims", str(a.eval_sims),
                  "--scenario", a.eval_scenario,
+                 "--device", a.device,
                  "--output", str(a.output)], cwd=root)
             if r.returncode != 0:
                 raise RuntimeError("periodic eval failed")

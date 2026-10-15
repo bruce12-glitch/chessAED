@@ -12,7 +12,7 @@ from aed.signals import learning_progress, leverage, utility
 class ControllerConfig:
     beta_l: float = 2.0
     beta_c: float = 0.5
-    tau: float = 0.01
+    tau: float = 0.15
     lam: float = 0.9
     bmax: float = 0.5
     mode: str = "detector"  # detector | random | off | diagnostics

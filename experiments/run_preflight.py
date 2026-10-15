@@ -23,7 +23,7 @@ from experiments import manifest as MF
 ROOT = Path(__file__).resolve().parent.parent
 TINY = {"games": "1", "uct-simulations": "4", "epochs": "3", "buffer": "64",
         "sample": "16", "batch": "8", "eval-every": "1", "eval-games": "1",
-        "eval-sims": "8"}
+        "eval-sims": "8", "device": "cpu"}
 CONTROL_ARMS = ["cnn_baseline", "cnn_fixed_noise", "cnn_random_trigger", "cnn_aed"]
 EXTRA_ARMS = ["gnn_baseline"]
 METRIC_COLS = ["iter", "vloss", "acc", "tv", "entropy", "Lt", "Ct", "Ut", "Bt", "temp",

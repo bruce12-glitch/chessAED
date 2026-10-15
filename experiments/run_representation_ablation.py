@@ -77,7 +77,8 @@ def _run(args: list[str]) -> None:
         raise RuntimeError(f"failed: {args[:3]}")
 
 
-def final_evals(m: dict, arm: str, seed: int, raw: Path, mpath: Path) -> None:
+def final_evals(m: dict, arm: str, seed: int, raw: Path, mpath: Path,
+                device: str = "auto") -> None:
     last = m["training"]["iterations"] - 1
     ck = raw / arm / f"seed_{seed:03d}" / f"ckpt_{last}.pt"
     for key in ("uct400", "uct800"):
@@ -89,6 +90,7 @@ def final_evals(m: dict, arm: str, seed: int, raw: Path, mpath: Path) -> None:
               "--checkpoint", str(ck), "--ckpt-step", str(last),
               "--games", str(f["games_per_seat"]), "--net-sims", str(m["evaluation"]["net_sims"]),
               "--eval-sims", str(f["ref_sims"]), "--scenario", m["scenario"]["eval_scenario"],
+              "--device", device,
               "--tag", f"final_{key}", "--output", str(raw / arm), "--manifest", str(mpath)])
 
 
@@ -117,6 +119,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check-gate", default="")
     ap.add_argument("--skip-final-eval", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--device", type=str, default=None,
+                    help="auto|cpu|cuda; default follows manifest hardware.device")
     a = ap.parse_args(argv)
     m = MF.load(a.manifest)
     MF.verify(m, require_locked=not a.allow_unlocked, check_code=not a.allow_unlocked)
@@ -132,6 +136,7 @@ def main(argv: list[str] | None = None) -> int:
         if need and not gate_ok(m, a.raw, need):
             raise SystemExit(f"{arm} blocked: gate '{need}' has not passed "
                              f"(run --check-gate {need} after the baseline finishes)")
+    device = a.device or m["hardware"].get("device", "auto")
     cells = plan(m, arms, seeds)
     if a.dry_run:
         print(json.dumps({"cells": cells, "budget": MF.expected_budget(m)}, indent=2))
@@ -139,12 +144,12 @@ def main(argv: list[str] | None = None) -> int:
     MF.copy_into(a.raw, a.manifest)
     write_costs(m, arms, a.raw)
     for arm, seed in cells:
-        args = MF.trainer_args(m, arm, seed, a.raw / arm, a.manifest) + ["--resume"]
+        args = MF.trainer_args(m, arm, seed, a.raw / arm, a.manifest) + ["--device", device]
         if a.allow_unlocked:
             args.append("--allow-unlocked")
         _run(["experiments.run_aed"] + args)
         if not a.skip_final_eval:
-            final_evals(m, arm, seed, a.raw, a.manifest)
+            final_evals(m, arm, seed, a.raw, a.manifest, device)
     return 0
 
 

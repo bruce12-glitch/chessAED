@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_PATH = ROOT / "experiments" / "configs" / "experiment_manifest_v1.yaml"
+DEFAULT_PATH = ROOT / "experiments" / "configs" / "experiment_manifest_v2.yaml"
 MANIFEST_NAME = "experiment_manifest_v1.yaml"
 CODE_FILES = [
     "gochess/core.py", "gochess/search.py", "gochess/scenarios.py", "gochess/nn.py",
@@ -113,7 +113,7 @@ def verify(m: dict, *, require_locked: bool = True, check_code: bool = True) -> 
 def copy_into(out_dir: Path | str, path: Path | str = DEFAULT_PATH) -> Path:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    dst = out_dir / MANIFEST_NAME
+    dst = out_dir / Path(path).name
     if dst.exists() and dst.read_bytes() != Path(path).read_bytes():
         raise ManifestError(f"{dst} exists with different content; refusing to mix manifests")
     shutil.copyfile(path, dst)
@@ -150,6 +150,7 @@ def trainer_args(m: dict, arm_name: str, seed: int, output: Path | str,
         "--eval-games", str(e["periodic"]["games_per_seat"]),
         "--eval-sims", str(e["periodic"]["ref_sims"]),
         "--eval-scenario", m["scenario"]["eval_scenario"],
+        "--device", str(m["hardware"].get("device", "auto")),
         "--manifest", str(manifest_path),
     ]
 
