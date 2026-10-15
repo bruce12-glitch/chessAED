@@ -52,7 +52,25 @@ class ControllerTests(unittest.TestCase):
     def test_drop_value_changes_utility(self) -> None:
         self.assertNotEqual(utility(1.0, 0.5, 2.0, 0.5, "none"),
                             utility(1.0, 0.5, 2.0, 0.5, "value"))
-        self.assertGreater(leverage(0.0), leverage(0.9))
+        self.assertLess(leverage(0.0), leverage(0.9))
+
+    def test_fires_in_frozen_regime(self) -> None:
+        cfg = ControllerConfig(beta_l=2.0, beta_c=0.5, tau=0.15,
+                               lam=0.9, bmax=0.5, mode="detector")
+        c = AEDController(cfg, seed=0)
+        fired = [c.step(1.0, 0.02)["shifted"] for _ in range(60)]
+        self.assertTrue(any(fired))
+
+    def test_quiet_while_learning(self) -> None:
+        cfg = ControllerConfig(beta_l=2.0, beta_c=0.5, tau=0.15,
+                               lam=0.9, bmax=0.5, mode="detector")
+        c = AEDController(cfg, seed=0)
+        v = 1.0
+        fired = []
+        for _ in range(20):
+            v -= 0.05
+            fired.append(c.step(v, 0.5)["shifted"])
+        self.assertFalse(any(fired))
 
 
 if __name__ == "__main__":

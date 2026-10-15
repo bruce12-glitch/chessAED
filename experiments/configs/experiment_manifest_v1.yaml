@@ -142,7 +142,7 @@ hardware:
   device: auto
   cpu_mcts_workers: 1
 code:
-  git_commit: unknown
+  git_commit: 64b2e0c276c882e5f1e5667a8ac400bc9623e6e5
   file_sha256:
     gochess/core.py: 0cf663ec8b6340868af72c28e3798d5f50f1075c54d377029a4285b285d6a726
     gochess/search.py: 352ef7eaa69052bd56c3be9da16c09a0ca3c4c0770c0483fb2b1e4d82fbc079a
@@ -166,4 +166,4 @@ code:
     evaluation/probes.py: 4283d3126d48501563609acc5d45466141ef95cd83e1f3502b9efffb102c553c
 lock:
   locked: true
-  manifest_hash: f8212559ebb000f80762dbb4264992dfb7575fc38b875d3eff93a1703592917c
+  manifest_hash: b8592eb3c8743ef5abf39f561922cd4d1130ecd64bcc09350b110f8ff2fbb36c

@@ -77,8 +77,10 @@ class ManifestTests(unittest.TestCase):
             self.assertEqual(m["models"]["gnn"]["param_count"], 222)
             with self.assertRaises(MF.ManifestError):
                 MF.lock(p, param_counts={}, probe_reference={})
-            txt = p.read_text().replace("tau: 0.01", "tau: 0.02")
-            p.write_text(txt)
+            txt = p.read_text()
+            cur = f"tau: {m['aed']['tau']}"
+            assert cur in txt, "tamper target must match locked tau"
+            p.write_text(txt.replace(cur, "tau: 999.25", 1))
             with self.assertRaises(MF.ManifestError):
                 MF.verify(MF.load(p))
 
