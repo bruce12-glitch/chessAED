@@ -248,11 +248,13 @@ class AnalysisTests(unittest.TestCase):
             self._build(raw)
             AN.main(["--raw", str(raw), "--out", str(out), "--allow-unlocked",
                      "--n-perm", "5000", "--n-boot", "500"])
-            for f in ("per_seed.csv", "paired_differences.csv", "paired_summary.csv",
-                      "primary_result.json", "escape_summary.csv", "final_eval.csv", "curves.csv",
-                      "triggers.csv", "learning_curves.png", "learning_curves.pdf",
-                      "aed_triggers.png", "aed_triggers.pdf", "final_eval.png", "final_eval.pdf",
-                      "experiment_manifest_v1.yaml", "analysis_summary.json"):
+            from experiments import manifest as _MF
+            want = ("per_seed.csv", "paired_differences.csv", "paired_summary.csv",
+                    "primary_result.json", "escape_summary.csv", "final_eval.csv", "curves.csv",
+                    "triggers.csv", "learning_curves.png", "learning_curves.pdf",
+                    "aed_triggers.png", "aed_triggers.pdf", "final_eval.png", "final_eval.pdf",
+                    "analysis_summary.json", Path(_MF.DEFAULT_PATH).name)
+            for f in want:
                 self.assertTrue((out / f).exists(), f)
             per = list(csv.DictReader((out / "per_seed.csv").open()))
             self.assertEqual(len(per), 8)                           # per-seed rows, not means
